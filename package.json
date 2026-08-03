@@ -1,0 +1,23 @@
+{
+  "name": "bkm-react-native",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Monorepo for the BKM Express React Native wrapper and demo app",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "demo": "yarn workspace bex-react-native-demo",
+    "typecheck": "yarn workspace bex-react-native typecheck",
+    "prepare:lib": "yarn workspace bex-react-native prepare",
+    "publish:lib": "yarn workspace bex-react-native publish:nexus"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BKMExpress/bkm-react-native.git"
+  },
+  "packageManager": "yarn@4.11.0",
+  "engines": {
+    "node": ">=18"
+  }
+}
