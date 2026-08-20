@@ -15,22 +15,33 @@ import {
   type BexEnvironment,
   type PaymentSecurity,
   type PresentationStyle,
+  type TransactionType,
 } from 'bex-react-native';
 
 const ENVIRONMENTS: BexEnvironment[] = ['dev', 'test', 'preprod', 'prod'];
 const SECURITIES: PaymentSecurity[] = ['none', 'otp', 'tds'];
 const STYLES: PresentationStyle[] = ['fullScreen', 'sheet'];
+const TRANSACTION_TYPES: Exclude<TransactionType, 'recurring'>[] = [
+  'sale',
+  'preAuth',
+];
+
+function formatTransactionType(value: TransactionType): string {
+  return value === 'preAuth' ? 'PRE_AUTH' : 'SALE';
+}
 
 function CycleChip<T extends string>({
   label,
   value,
   options,
   onChange,
+  formatValue,
 }: {
   label: string;
   value: T;
   options: T[];
   onChange: (next: T) => void;
+  formatValue?: (value: T) => string;
 }) {
   return (
     <Pressable
@@ -41,7 +52,7 @@ function CycleChip<T extends string>({
       }}
     >
       <Text style={styles.chipLabel}>
-        {label}: {value}
+        {label}: {formatValue ? formatValue(value) : value}
       </Text>
     </Pressable>
   );
@@ -57,6 +68,8 @@ export default function App() {
   const [environment, setEnvironment] = useState<BexEnvironment>('dev');
   const [security, setSecurity] = useState<PaymentSecurity>('none');
   const [style, setStyle] = useState<PresentationStyle>('fullScreen');
+  const [transactionType, setTransactionType] =
+    useState<Exclude<TransactionType, 'recurring'>>('sale');
   const [busy, setBusy] = useState(false);
   const [initialized, setInitialized] = useState(false);
   const [resultText, setResultText] = useState('Ready.');
@@ -127,6 +140,13 @@ export default function App() {
             options={STYLES}
             onChange={setStyle}
           />
+          <CycleChip
+            label="TxnType"
+            value={transactionType}
+            options={TRANSACTION_TYPES}
+            onChange={setTransactionType}
+            formatValue={formatTransactionType}
+          />
         </View>
 
         <View style={styles.actions}>
@@ -142,6 +162,7 @@ export default function App() {
                   gsmNo,
                   environment,
                   currencyCode: 'TRY',
+                  transactionType,
                 });
                 setInitialized(true);
                 return result;
@@ -160,7 +181,7 @@ export default function App() {
                     security,
                     installmentCount: 1,
                     currency: 'TRY',
-                    transactionType: 'sale',
+                    transactionType,
                     successUrl:
                       'https://trcuzdan-dev.bkmtest.com.tr/sdk/demo/success',
                     failUrl:
@@ -183,7 +204,7 @@ export default function App() {
                     security,
                     installmentCount: 1,
                     currency: 'TRY',
-                    transactionType: 'sale',
+                    transactionType,
                     successUrl:
                       'https://trcuzdan-dev.bkmtest.com.tr/sdk/demo/success',
                     failUrl:
